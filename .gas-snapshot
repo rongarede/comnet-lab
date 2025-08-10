@@ -1,0 +1,3 @@
+Baseline:test_baseline() (gas: 234)
+CounterTest:testFuzz_SetNumber(uint256) (runs: 256, μ: 28978, ~: 29289)
+CounterTest:test_Increment() (gas: 28783)
