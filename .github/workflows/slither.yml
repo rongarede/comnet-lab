@@ -1,0 +1,209 @@
+name: Slither Security Analysis
+
+# 触发条件：每次push和pull request时运行
+on:
+  push:
+    branches: [ main, master, develop, chore/* ]
+    paths:
+      - 'src/**/*.sol'
+      - 'foundry.toml'
+      - '.github/workflows/slither.yml'
+  pull_request:
+    branches: [ main, master, develop ]
+    paths:
+      - 'src/**/*.sol'
+      - 'foundry.toml'
+      - '.github/workflows/slither.yml'
+
+# 权限设置：需要写入security-events来上传SARIF报告
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  slither-analyze:
+    runs-on: ubuntu-latest
+    name: Run Slither Analysis
+    
+    steps:
+      # 步骤1: 检出代码仓库
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      # 步骤2: 安装Python环境 (Slither需要Python)
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      # 步骤3: 安装Foundry工具链
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      # 步骤4: 安装Node.js (某些依赖可能需要)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # 步骤5: 缓存Foundry依赖以提升构建速度
+      - name: Cache Foundry dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.foundry
+            lib
+          key: foundry-${{ runner.os }}-${{ hashFiles('foundry.toml', 'lib/**') }}
+          restore-keys: |
+            foundry-${{ runner.os }}-
+
+      # 步骤6: 安装Git子模块依赖
+      - name: Install dependencies
+        run: |
+          git submodule update --init --recursive
+          forge install --no-commit
+
+      # 步骤7: 安装Slither安全分析工具
+      - name: Install Slither
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install slither-analyzer==0.11.3 crytic-compile
+          # 验证Slither安装成功
+          slither --version
+
+      # 步骤8: 验证编译环境
+      - name: Verify compilation environment
+        run: |
+          # 显示环境信息
+          echo "=== Environment Information ==="
+          forge --version
+          solc --version || echo "solc not in PATH, will use Foundry's solc"
+          python --version
+          slither --version
+          echo "=== Foundry Configuration ==="
+          forge config
+
+      # 步骤9: 编译合约以验证无编译错误
+      - name: Compile contracts
+        run: |
+          forge clean
+          forge build --sizes
+
+      # 步骤10: 运行Slither安全分析
+      - name: Run Slither analysis
+        run: |
+          # 创建输出目录
+          mkdir -p tools reports
+          
+          # 运行Slither安全扫描，使用与本地相同的配置
+          slither . \
+            --compile-force-framework foundry \
+            --filter-paths '(^|/)(lib|node_modules|test|mocks)(/|$)' \
+            --json tools/slither-report.json \
+            --sarif tools/slither-report.sarif \
+            --exclude-optimization
+          
+          # 显示扫描结果摘要
+          echo "=== Slither Analysis Complete ==="
+          ls -la tools/
+          
+          # 检查SARIF文件是否生成
+          if [ -f "tools/slither-report.sarif" ]; then
+            echo "✅ SARIF report generated successfully"
+            # 显示SARIF文件大小和结构预览
+            wc -c tools/slither-report.sarif
+            echo "SARIF structure preview:"
+            python -c "
+            import json
+            with open('tools/slither-report.sarif', 'r') as f:
+                data = json.load(f)
+            runs = data.get('runs', [])
+            if runs:
+                results = runs[0].get('results', [])
+                print(f'Found {len(results)} security findings')
+                for i, result in enumerate(results[:3]):
+                    rule_id = result.get('ruleId', 'unknown')
+                    level = result.get('level', 'note')
+                    print(f'  {i+1}. {rule_id} ({level})')
+            else:
+                print('No security findings detected')
+            "
+          else
+            echo "❌ SARIF report not generated"
+            exit 1
+          fi
+
+      # 步骤11: 上传SARIF报告到GitHub Code Scanning
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()  # 即使前面步骤失败也要尝试上传
+        with:
+          sarif_file: tools/slither-report.sarif
+          category: slither
+
+      # 步骤12: 保存扫描报告作为构建产物
+      - name: Upload scan reports as artifacts
+        uses: actions/upload-artifact@v4
+        if: always()  # 总是上传报告，便于调试
+        with:
+          name: slither-reports
+          path: |
+            tools/slither-report.json
+            tools/slither-report.sarif
+          retention-days: 30
+
+      # 步骤13: 生成PR评论摘要 (仅在PR时运行)
+      - name: Comment PR with results
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+            
+            try {
+              const jsonReport = JSON.parse(fs.readFileSync('tools/slither-report.json', 'utf8'));
+              const detectors = jsonReport.results?.detectors || [];
+              
+              const severity = { High: 0, Medium: 0, Low: 0, Informational: 0 };
+              detectors.forEach(d => {
+                const impact = d.impact || 'Informational';
+                severity[impact] = (severity[impact] || 0) + 1;
+              });
+              
+              const total = Object.values(severity).reduce((a, b) => a + b, 0);
+              
+              let comment = `## 🔒 Slither Security Analysis Results\n\n`;
+              comment += `**Summary:** ${total} total findings\n\n`;
+              comment += `| Severity | Count |\n`;
+              comment += `|----------|-------|\n`;
+              comment += `| 🔴 High | ${severity.High} |\n`;
+              comment += `| 🟡 Medium | ${severity.Medium} |\n`;
+              comment += `| 🟠 Low | ${severity.Low} |\n`;
+              comment += `| ℹ️ Info | ${severity.Informational} |\n\n`;
+              
+              if (total === 0) {
+                comment += `✅ **No security issues detected!**\n\n`;
+              } else {
+                comment += `⚠️ **Please review the security findings in the Code Scanning tab.**\n\n`;
+              }
+              
+              comment += `📊 View detailed results in the [Security tab](${context.payload.repository.html_url}/security/code-scanning)\n\n`;
+              comment += `*Analysis performed with Slither v0.11.3*`;
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            } catch (error) {
+              console.error('Error creating PR comment:', error);
+              // 不让评论失败影响整个工作流
+            }
