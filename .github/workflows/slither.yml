@@ -27,80 +27,60 @@ jobs:
     name: Run Slither Analysis
     
     steps:
-      # 步骤1: 检出代码仓库
-      - name: Checkout repository
+      # 步骤1: 检出代码仓库（包含所有子模块）
+      - name: Checkout repository with submodules
         uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
 
-      # 步骤2: 安装Python环境 (不使用pip缓存避免失败)
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-          # 移除缓存配置避免requirements.txt依赖
-
-      # 步骤3: 安装Foundry工具链
+      # 步骤2: 安装Foundry工具链（使用stable版本与本地一致）
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
 
-      # 步骤4: 缓存Foundry依赖
-      - name: Cache Foundry dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.foundry
-            lib
-          key: foundry-${{ runner.os }}-${{ hashFiles('foundry.toml', 'lib/**') }}
-          restore-keys: |
-            foundry-${{ runner.os }}-
-
-      # 步骤5: 安装Git子模块依赖
-      - name: Install dependencies
+      # 步骤3: 运行forge build作为sanity check
+      - name: Build contracts (sanity check)
         run: |
-          git submodule update --init --recursive
-          forge install --no-commit
-
-      # 步骤6: 使用pipx安装Slither (避免pip依赖问题)
-      - name: Install Slither with pipx
-        run: |
-          # 安装pipx
-          python -m pip install --user pipx
-          python -m pipx ensurepath
-          # 添加pipx路径到环境
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          # 使用pipx安装Slither
-          pipx install slither-analyzer==0.11.3
-          # 验证安装
-          slither --version
-
-      # 步骤7: 验证编译环境
-      - name: Verify compilation environment
-        run: |
-          echo "=== Environment Information ==="
-          forge --version
-          python --version
-          slither --version
           echo "=== Foundry Configuration ==="
+          forge --version
           forge config
-
-      # 步骤8: 编译合约
-      - name: Compile contracts
-        run: |
+          echo "=== Building contracts ==="
           forge clean
           forge build --sizes
 
-      # 步骤9: 运行Slither分析 (添加步骤ID用于条件判断)
+      # 步骤4: 安装Python环境
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 步骤5: 安装pipx并用其安装Slither
+      - name: Install Slither with pipx
+        run: |
+          echo "=== Installing pipx ==="
+          python -m pip install --user pipx
+          python -m pipx ensurepath
+          # 添加pipx路径到GitHub Actions PATH
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          
+          echo "=== Installing Slither with pipx ==="
+          pipx install slither-analyzer==0.11.3
+          pipx inject slither-analyzer crytic-compile
+          
+          echo "=== Verifying installation ==="
+          slither --version
+
+      # 步骤6: 运行Slither安全分析
       - name: Run Slither analysis
         id: slither
         run: |
           # 创建输出目录
           mkdir -p tools reports
           
-          # 运行Slither扫描，保持与本地相同的参数
+          echo "=== Running Slither Security Analysis ==="
+          # 使用与本地相同的基线参数
           slither . \
             --compile-force-framework foundry \
             --filter-paths '(^|/)(lib|node_modules|test|mocks)(/|$)' \
@@ -108,46 +88,70 @@ jobs:
             --sarif tools/slither-report.sarif \
             --exclude-optimization
           
-          echo "=== Slither Analysis Complete ==="
+          echo "=== Analysis Complete ==="
           ls -la tools/
           
-          # 检查报告文件
-          if [ -f "tools/slither-report.sarif" ]; then
-            echo "✅ SARIF report generated successfully"
-            wc -c tools/slither-report.sarif
-            echo "SARIF preview:"
+          # 验证报告文件生成
+          if [ -f "tools/slither-report.sarif" ] && [ -f "tools/slither-report.json" ]; then
+            echo "✅ Both JSON and SARIF reports generated successfully"
+            
+            # 显示SARIF文件信息
+            echo "SARIF file size: $(wc -c < tools/slither-report.sarif) bytes"
+            
+            # 解析并显示扫描结果统计
+            echo "=== Security Findings Summary ==="
             python -c "
             import json
             try:
+                # 解析SARIF报告
                 with open('tools/slither-report.sarif', 'r') as f:
-                    data = json.load(f)
-                runs = data.get('runs', [])
-                if runs:
-                    results = runs[0].get('results', [])
-                    print(f'Security findings: {len(results)}')
-                    for i, result in enumerate(results[:3]):
-                        rule_id = result.get('ruleId', 'unknown')
+                    sarif_data = json.load(f)
+                
+                runs = sarif_data.get('runs', [])
+                if runs and 'results' in runs[0]:
+                    results = runs[0]['results']
+                    print(f'Total security findings: {len(results)}')
+                    
+                    # 按严重程度统计
+                    levels = {}
+                    for result in results:
                         level = result.get('level', 'note')
-                        print(f'  {i+1}. {rule_id} ({level})')
+                        levels[level] = levels.get(level, 0) + 1
+                    
+                    for level, count in sorted(levels.items()):
+                        print(f'  {level.capitalize()}: {count}')
                 else:
                     print('No security findings detected')
+                
+                # 解析JSON报告验证
+                with open('tools/slither-report.json', 'r') as f:
+                    json_data = json.load(f)
+                    detectors = json_data.get('results', {}).get('detectors', [])
+                    print(f'JSON report detectors: {len(detectors)}')
+                    
             except Exception as e:
-                print(f'Error parsing SARIF: {e}')
+                print(f'Error parsing reports: {e}')
+                exit(1)
             "
           else
-            echo "❌ SARIF report not found"
+            echo "❌ Report generation failed"
+            echo "Expected files:"
+            echo "  - tools/slither-report.json"
+            echo "  - tools/slither-report.sarif"
+            echo "Generated files:"
+            find tools/ -name "*.json" -o -name "*.sarif" 2>/dev/null || echo "  (none found)"
             exit 1
           fi
 
-      # 步骤10: 上传SARIF到GitHub Code Scanning (仅在Slither成功时)
+      # 步骤7: 上传SARIF到GitHub Code Scanning（仅在Slither成功时）
       - name: Upload SARIF to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
-        if: steps.slither.outcome == 'success' && always()
+        if: steps.slither.outcome == 'success'
         with:
           sarif_file: tools/slither-report.sarif
           category: slither
 
-      # 步骤11: 保存报告作为构建产物 (总是执行)
+      # 步骤8: 保存报告作为构建产物（总是执行以便调试）
       - name: Upload scan reports as artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -158,7 +162,7 @@ jobs:
             tools/slither-report.sarif
           retention-days: 30
 
-      # 步骤12: 生成PR评论 (仅在PR且Slither成功时)
+      # 步骤9: 生成PR评论（仅在PR且Slither成功时）
       - name: Comment PR with results
         uses: actions/github-script@v7
         if: github.event_name == 'pull_request' && steps.slither.outcome == 'success'
@@ -167,9 +171,11 @@ jobs:
             const fs = require('fs');
             
             try {
+              // 读取JSON报告
               const jsonReport = JSON.parse(fs.readFileSync('tools/slither-report.json', 'utf8'));
               const detectors = jsonReport.results?.detectors || [];
               
+              // 统计各严重程度的发现
               const severity = { High: 0, Medium: 0, Low: 0, Informational: 0 };
               detectors.forEach(d => {
                 const impact = d.impact || 'Informational';
@@ -178,6 +184,7 @@ jobs:
               
               const total = Object.values(severity).reduce((a, b) => a + b, 0);
               
+              // 构建PR评论
               let comment = `## 🔒 Slither Security Analysis Results\n\n`;
               comment += `**Summary:** ${total} total findings\n\n`;
               comment += `| Severity | Count |\n`;
@@ -194,16 +201,19 @@ jobs:
               }
               
               comment += `📊 [View detailed results](${context.payload.repository.html_url}/security/code-scanning)\n\n`;
-              comment += `🔗 [Download reports artifact](${context.payload.repository.html_url}/actions/runs/${context.runId})\n\n`;
-              comment += `*Analysis by Slither v0.11.3 • Run #${context.runNumber}*`;
+              comment += `🔗 [Download reports](${context.payload.repository.html_url}/actions/runs/${context.runId})\n\n`;
+              comment += `*Analyzed with Slither v0.11.3 • Run #${context.runNumber}*`;
               
+              // 创建PR评论
               await github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 body: comment
               });
+              
+              console.log('✅ PR comment posted successfully');
             } catch (error) {
               console.error('Error creating PR comment:', error);
-              // 不让评论失败影响整个工作流
+              // 不让评论失败影响整个工作流成功状态
             }
