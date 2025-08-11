@@ -76,72 +76,28 @@ jobs:
       - name: Run Slither analysis
         id: slither
         run: |
-          # 创建输出目录
+          set -euo pipefail
           mkdir -p tools reports
-          
+          # 清理旧报告，避免 overwrite 提示
+          rm -f tools/slither-report.json tools/slither-report.sarif
+
           echo "=== Running Slither Security Analysis ==="
-          # 使用与本地相同的基线参数
           slither . \
             --compile-force-framework foundry \
             --filter-paths '(^|/)(lib|node_modules|test|mocks)(/|$)' \
             --json tools/slither-report.json \
             --sarif tools/slither-report.sarif \
             --exclude-optimization
-          
+
           echo "=== Analysis Complete ==="
           ls -la tools/
-          
-          # 验证报告文件生成
-          if [ -f "tools/slither-report.sarif" ] && [ -f "tools/slither-report.json" ]; then
-            echo "✅ Both JSON and SARIF reports generated successfully"
-            
-            # 显示SARIF文件信息
-            echo "SARIF file size: $(wc -c < tools/slither-report.sarif) bytes"
-            
-            # 解析并显示扫描结果统计
-            echo "=== Security Findings Summary ==="
-            python -c "
-            import json
-            try:
-                # 解析SARIF报告
-                with open('tools/slither-report.sarif', 'r') as f:
-                    sarif_data = json.load(f)
-                
-                runs = sarif_data.get('runs', [])
-                if runs and 'results' in runs[0]:
-                    results = runs[0]['results']
-                    print(f'Total security findings: {len(results)}')
-                    
-                    # 按严重程度统计
-                    levels = {}
-                    for result in results:
-                        level = result.get('level', 'note')
-                        levels[level] = levels.get(level, 0) + 1
-                    
-                    for level, count in sorted(levels.items()):
-                        print(f'  {level.capitalize()}: {count}')
-                else:
-                    print('No security findings detected')
-                
-                # 解析JSON报告验证
-                with open('tools/slither-report.json', 'r') as f:
-                    json_data = json.load(f)
-                    detectors = json_data.get('results', {}).get('detectors', [])
-                    print(f'JSON report detectors: {len(detectors)}')
-                    
-            except Exception as e:
-                print(f'Error parsing reports: {e}')
-                exit(1)
-            "
-          else
-            echo "❌ Report generation failed"
-            echo "Expected files:"
-            echo "  - tools/slither-report.json"
-            echo "  - tools/slither-report.sarif"
-            echo "Generated files:"
-            find tools/ -name "*.json" -o -name "*.sarif" 2>/dev/null || echo "  (none found)"
-            exit 1
-          fi
+          # 报告文件校验
+          test -s tools/slither-report.json
+          test -s tools/slither-report.sarif
+
+          # 使用 jq 输出摘要，失败不致命
+          echo "=== Security Findings Summary (SARIF) ==="
+          jq -r 'if (.runs|length>0 and .runs[0].results) then "findings=\(.runs[0].results|length)" else "findings=0" end' tools/slither-report.sarif || echo "findings=unknown"
 
       # 步骤7: 上传SARIF到GitHub Code Scanning（仅在Slither成功时）
       - name: Upload SARIF to GitHub Code Scanning
