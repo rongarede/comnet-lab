@@ -7,7 +7,7 @@ contract Handler {
     address[] internal collateralAssets;
 
     // TODO: Implement supply(uint256 amount) with input boundary convergence
-    // TODO: Implement withdraw(uint256 amount) with balance constraints  
+    // TODO: Implement withdraw(uint256 amount) with balance constraints
     // TODO: Implement borrow(uint256 amount) with collateral factor limits
     // TODO: Implement repay(uint256 amount) with debt ceiling constraints
     // TODO: Add liquidate() action for underwater positions
@@ -32,7 +32,7 @@ contract Handler {
 
     // TODO: Add helper functions for:
     // - _boundActorIndex(uint256 actorSeed) returns (uint256)
-    // - _boundAssetIndex(uint256 assetSeed) returns (uint256) 
+    // - _boundAssetIndex(uint256 assetSeed) returns (uint256)
     // - _boundAmount(uint256 amountSeed, uint256 maxAmount) returns (uint256)
     // - _selectRandomActor(uint256 seed) returns (address)
     // - _selectRandomCollateral(uint256 seed) returns (address)

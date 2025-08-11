@@ -1,0 +1,310 @@
+/Users/youshuncheng/Library/Python/3.9/lib/python/site-packages/slither/__main__.py:172: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import iter_entry_points  # pylint: disable=import-outside-toplevel
+'forge config --json' running
+Could not detect solc version from Foundry config. Falling back to system version...
+'solc --version' running
+'solc comet/=lib/comet/contracts/ ds-test/=lib/comet/forge/lib/forge-std/lib/ds-test/src/ forge-std/=lib/forge-std/src/ lib/comet/contracts/Comet.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --optimize-runs 200 --evm-version london --allow-paths .,/Users/youshuncheng/comnet-lab/lib/comet/contracts' running
+Compilation warnings/errors on lib/comet/contracts/Comet.sol:
+Warning: This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> lib/comet/contracts/Comet.sol:13:1:
+   |
+13 | contract Comet is CometMainInterface {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+    --> lib/comet/contracts/Comet.sol:1367:5:
+     |
+1367 |     fallback() external payable {
+     |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Unused local variable.
+   --> lib/comet/contracts/Comet.sol:227:9:
+    |
+227 |         uint256 status;
+    |         ^^^^^^^^^^^^^^
+
+Warning: Contract code size is 34335 bytes and exceeds 24576 bytes (a limit introduced in Spurious Dragon). This contract may not be deployable on mainnet. Consider enabling the optimizer (with a low "runs" value!), turning off revert strings, or using libraries.
+  --> lib/comet/contracts/Comet.sol:13:1:
+   |
+13 | contract Comet is CometMainInterface {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+
+
+INFO:Detectors:
+CometStorage.isAllowed (lib/comet/contracts/CometStorage.sol#63) is never initialized. It is used in:
+	- CometCore.hasPermission(address,address) (lib/comet/contracts/CometCore.sol#72-74)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+INFO:Detectors:
+Comet.getAssetInfo(uint8) (lib/comet/contracts/Comet.sol#309-376) performs a multiplication on the result of a division:
+	- rescale = FACTOR_SCALE / 1e4 (lib/comet/contracts/Comet.sol#356)
+	- borrowCollateralFactor = uint64(((word_a >> 160) & type()(uint16).max) * rescale) (lib/comet/contracts/Comet.sol#357)
+Comet.getAssetInfo(uint8) (lib/comet/contracts/Comet.sol#309-376) performs a multiplication on the result of a division:
+	- rescale = FACTOR_SCALE / 1e4 (lib/comet/contracts/Comet.sol#356)
+	- liquidateCollateralFactor = uint64(((word_a >> 176) & type()(uint16).max) * rescale) (lib/comet/contracts/Comet.sol#358)
+Comet.getAssetInfo(uint8) (lib/comet/contracts/Comet.sol#309-376) performs a multiplication on the result of a division:
+	- rescale = FACTOR_SCALE / 1e4 (lib/comet/contracts/Comet.sol#356)
+	- liquidationFactor = uint64(((word_a >> 192) & type()(uint16).max) * rescale) (lib/comet/contracts/Comet.sol#359)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+INFO:Detectors:
+IERC20NonStandard (lib/comet/contracts/IERC20NonStandard.sol#9-43) has incorrect ERC20 function interface:IERC20NonStandard.approve(address,uint256) (lib/comet/contracts/IERC20NonStandard.sol#21)
+IERC20NonStandard (lib/comet/contracts/IERC20NonStandard.sol#9-43) has incorrect ERC20 function interface:IERC20NonStandard.transfer(address,uint256) (lib/comet/contracts/IERC20NonStandard.sol#28)
+IERC20NonStandard (lib/comet/contracts/IERC20NonStandard.sol#9-43) has incorrect ERC20 function interface:IERC20NonStandard.transferFrom(address,address,uint256) (lib/comet/contracts/IERC20NonStandard.sol#36)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-erc20-interface
+INFO:Detectors:
+Comet.getUtilization() (lib/comet/contracts/Comet.sol#478-486) uses a dangerous strict equality:
+	- totalSupply_ == 0 (lib/comet/contracts/Comet.sol#481)
+Comet.updateAssetsIn(address,CometCore.AssetInfo,uint128,uint128) (lib/comet/contracts/Comet.sol#743-756) uses a dangerous strict equality:
+	- initialUserBalance != 0 && finalUserBalance == 0 (lib/comet/contracts/Comet.sol#752)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+INFO:Detectors:
+Contract locking ether found:
+	Contract Comet (lib/comet/contracts/Comet.sol#13-1379) has payable functions:
+	 - Comet.fallback() (lib/comet/contracts/Comet.sol#1367-1377)
+	But does not have a function to withdraw the ether
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#contracts-that-lock-ether
+INFO:Detectors:
+Comet.getAssetInfo(uint8).word_b (lib/comet/contracts/Comet.sol#313) is a local variable never initialized
+Comet.getAssetInfo(uint8).word_a (lib/comet/contracts/Comet.sol#312) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+INFO:Detectors:
+Comet.getPrice(address) (lib/comet/contracts/Comet.sol#493-497) ignores return value by (None,price,None,None,None) = IPriceFeed(priceFeed).latestRoundData() (lib/comet/contracts/Comet.sol#494)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+INFO:Detectors:
+Comet.getPrice(address) (lib/comet/contracts/Comet.sol#493-497) has external calls inside a loop: (None,price,None,None,None) = IPriceFeed(priceFeed).latestRoundData() (lib/comet/contracts/Comet.sol#494)
+	Calls stack containing the loop:
+		Comet.absorb(address,address[])
+		Comet.absorbInternal(address,address)
+		Comet.isLiquidatable(address)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+INFO:Detectors:
+Reentrancy in Comet.supplyBase(address,address,uint256) (lib/comet/contracts/Comet.sol#881-903):
+	External calls:
+	- amount = doTransferIn(baseToken,from,amount) (lib/comet/contracts/Comet.sol#882)
+		- IERC20NonStandard(asset).transferFrom(from,address(this),amount) (lib/comet/contracts/Comet.sol#788)
+	State variables written after the call(s):
+	- accrueInternal() (lib/comet/contracts/Comet.sol#884)
+		- (baseSupplyIndex,baseBorrowIndex) = accruedInterestIndices(timeElapsed) (lib/comet/contracts/Comet.sol#423)
+	- accrueInternal() (lib/comet/contracts/Comet.sol#884)
+		- (baseSupplyIndex,baseBorrowIndex) = accruedInterestIndices(timeElapsed) (lib/comet/contracts/Comet.sol#423)
+	- accrueInternal() (lib/comet/contracts/Comet.sol#884)
+		- lastAccrualTime = now_ (lib/comet/contracts/Comet.sol#430)
+	- totalBorrowBase -= repayAmount (lib/comet/contracts/Comet.sol#894)
+	- totalSupplyBase += supplyAmount (lib/comet/contracts/Comet.sol#893)
+	- accrueInternal() (lib/comet/contracts/Comet.sol#884)
+		- trackingBorrowIndex += safe64(divBaseWei(baseTrackingBorrowSpeed * timeElapsed,totalBorrowBase)) (lib/comet/contracts/Comet.sol#428)
+	- accrueInternal() (lib/comet/contracts/Comet.sol#884)
+		- trackingSupplyIndex += safe64(divBaseWei(baseTrackingSupplySpeed * timeElapsed,totalSupplyBase)) (lib/comet/contracts/Comet.sol#425)
+	- updateBasePrincipal(dst,dstUser,dstPrincipalNew) (lib/comet/contracts/Comet.sol#896)
+		- userBasic[account] = basic (lib/comet/contracts/Comet.sol#779)
+Reentrancy in Comet.supplyCollateral(address,address,address,uint128) (lib/comet/contracts/Comet.sol#908-925):
+	External calls:
+	- amount = safe128(doTransferIn(asset,from,amount)) (lib/comet/contracts/Comet.sol#909)
+		- IERC20NonStandard(asset).transferFrom(from,address(this),amount) (lib/comet/contracts/Comet.sol#788)
+	State variables written after the call(s):
+	- totalsCollateral[asset] = totals (lib/comet/contracts/Comet.sol#919)
+	- updateAssetsIn(dst,assetInfo,dstCollateral,dstCollateralNew) (lib/comet/contracts/Comet.sol#922)
+		- userBasic[account].assetsIn |= (uint16(1) << assetInfo.offset) (lib/comet/contracts/Comet.sol#751)
+		- userBasic[account].assetsIn &= ~ (uint16(1) << assetInfo.offset) (lib/comet/contracts/Comet.sol#754)
+	- userCollateral[dst][asset].balance = dstCollateralNew (lib/comet/contracts/Comet.sol#920)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+INFO:Detectors:
+Reentrancy in Comet.supplyBase(address,address,uint256) (lib/comet/contracts/Comet.sol#881-903):
+	External calls:
+	- amount = doTransferIn(baseToken,from,amount) (lib/comet/contracts/Comet.sol#882)
+		- IERC20NonStandard(asset).transferFrom(from,address(this),amount) (lib/comet/contracts/Comet.sol#788)
+	Event emitted after the call(s):
+	- Supply(from,dst,amount) (lib/comet/contracts/Comet.sol#898)
+	- Transfer(address(0),dst,presentValueSupply(baseSupplyIndex,supplyAmount)) (lib/comet/contracts/Comet.sol#901)
+Reentrancy in Comet.supplyCollateral(address,address,address,uint128) (lib/comet/contracts/Comet.sol#908-925):
+	External calls:
+	- amount = safe128(doTransferIn(asset,from,amount)) (lib/comet/contracts/Comet.sol#909)
+		- IERC20NonStandard(asset).transferFrom(from,address(this),amount) (lib/comet/contracts/Comet.sol#788)
+	Event emitted after the call(s):
+	- SupplyCollateral(from,dst,asset,amount) (lib/comet/contracts/Comet.sol#924)
+Reentrancy in Comet.withdrawBase(address,address,uint256) (lib/comet/contracts/Comet.sol#1103-1130):
+	External calls:
+	- doTransferOut(baseToken,to,amount) (lib/comet/contracts/Comet.sol#1123)
+		- IERC20NonStandard(asset).transfer(to,amount) (lib/comet/contracts/Comet.sol#812)
+	Event emitted after the call(s):
+	- Transfer(src,address(0),presentValueSupply(baseSupplyIndex,withdrawAmount)) (lib/comet/contracts/Comet.sol#1128)
+	- Withdraw(src,to,amount) (lib/comet/contracts/Comet.sol#1125)
+Reentrancy in Comet.withdrawCollateral(address,address,address,uint128) (lib/comet/contracts/Comet.sol#1135-1151):
+	External calls:
+	- doTransferOut(asset,to,amount) (lib/comet/contracts/Comet.sol#1148)
+		- IERC20NonStandard(asset).transfer(to,amount) (lib/comet/contracts/Comet.sol#812)
+	Event emitted after the call(s):
+	- WithdrawCollateral(src,to,asset,amount) (lib/comet/contracts/Comet.sol#1150)
+Reentrancy in Comet.withdrawReserves(address,uint256) (lib/comet/contracts/Comet.sol#1293-1302):
+	External calls:
+	- doTransferOut(baseToken,to,amount) (lib/comet/contracts/Comet.sol#1299)
+		- IERC20NonStandard(asset).transfer(to,amount) (lib/comet/contracts/Comet.sol#812)
+	Event emitted after the call(s):
+	- WithdrawReserves(to,amount) (lib/comet/contracts/Comet.sol#1301)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+INFO:Detectors:
+Comet.initializeStorage() (lib/comet/contracts/Comet.sol#237-248) uses timestamp for comparisons
+	Dangerous comparisons:
+	- lastAccrualTime != 0 (lib/comet/contracts/Comet.sol#238)
+Comet.getNowInternal() (lib/comet/contracts/Comet.sol#395-398) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= 2 ** 40 (lib/comet/contracts/Comet.sol#396)
+Comet.accruedInterestIndices(uint256) (lib/comet/contracts/Comet.sol#403-414) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timeElapsed > 0 (lib/comet/contracts/Comet.sol#406)
+Comet.accrueInternal() (lib/comet/contracts/Comet.sol#419-432) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timeElapsed > 0 (lib/comet/contracts/Comet.sol#422)
+	- totalSupplyBase >= baseMinForRewards (lib/comet/contracts/Comet.sol#424)
+	- totalBorrowBase >= baseMinForRewards (lib/comet/contracts/Comet.sol#427)
+Comet.getSupplyRate(uint256) (lib/comet/contracts/Comet.sol#449-457) uses timestamp for comparisons
+	Dangerous comparisons:
+	- utilization <= supplyKink (lib/comet/contracts/Comet.sol#450)
+Comet.getBorrowRate(uint256) (lib/comet/contracts/Comet.sol#464-472) uses timestamp for comparisons
+	Dangerous comparisons:
+	- utilization <= borrowKink (lib/comet/contracts/Comet.sol#465)
+Comet.getUtilization() (lib/comet/contracts/Comet.sol#478-486) uses timestamp for comparisons
+	Dangerous comparisons:
+	- totalSupply_ == 0 (lib/comet/contracts/Comet.sol#481)
+Comet.isBorrowCollateralized(address) (lib/comet/contracts/Comet.sol#524-559) uses timestamp for comparisons
+	Dangerous comparisons:
+	- principal >= 0 (lib/comet/contracts/Comet.sol#527)
+	- liquidity >= 0 (lib/comet/contracts/Comet.sol#540)
+	- liquidity >= 0 (lib/comet/contracts/Comet.sol#558)
+Comet.isLiquidatable(address) (lib/comet/contracts/Comet.sol#566-601) uses timestamp for comparisons
+	Dangerous comparisons:
+	- principal >= 0 (lib/comet/contracts/Comet.sol#569)
+	- liquidity >= 0 (lib/comet/contracts/Comet.sol#582)
+	- liquidity < 0 (lib/comet/contracts/Comet.sol#600)
+Comet.repayAndSupplyAmount(int104,int104) (lib/comet/contracts/Comet.sol#606-617) uses timestamp for comparisons
+	Dangerous comparisons:
+	- newPrincipal < oldPrincipal (lib/comet/contracts/Comet.sol#608)
+	- newPrincipal <= 0 (lib/comet/contracts/Comet.sol#610)
+	- oldPrincipal >= 0 (lib/comet/contracts/Comet.sol#612)
+Comet.withdrawAndBorrowAmount(int104,int104) (lib/comet/contracts/Comet.sol#622-633) uses timestamp for comparisons
+	Dangerous comparisons:
+	- newPrincipal > oldPrincipal (lib/comet/contracts/Comet.sol#624)
+	- newPrincipal >= 0 (lib/comet/contracts/Comet.sol#626)
+Comet.isInAsset(uint16,uint8) (lib/comet/contracts/Comet.sol#736-738) uses timestamp for comparisons
+	Dangerous comparisons:
+	- (assetsIn & (uint16(1) << assetOffset) != 0) (lib/comet/contracts/Comet.sol#737)
+Comet.updateAssetsIn(address,CometCore.AssetInfo,uint128,uint128) (lib/comet/contracts/Comet.sol#743-756) uses timestamp for comparisons
+	Dangerous comparisons:
+	- initialUserBalance == 0 && finalUserBalance != 0 (lib/comet/contracts/Comet.sol#749)
+	- initialUserBalance != 0 && finalUserBalance == 0 (lib/comet/contracts/Comet.sol#752)
+Comet.updateBasePrincipal(address,CometStorage.UserBasic,int104) (lib/comet/contracts/Comet.sol#761-780) uses timestamp for comparisons
+	Dangerous comparisons:
+	- principal >= 0 (lib/comet/contracts/Comet.sol#765)
+	- principalNew >= 0 (lib/comet/contracts/Comet.sol#773)
+Comet.supplyInternal(address,address,address,address,uint256) (lib/comet/contracts/Comet.sol#864-876) uses timestamp for comparisons
+	Dangerous comparisons:
+	- amount == type()(uint256).max (lib/comet/contracts/Comet.sol#869)
+Comet.supplyBase(address,address,uint256) (lib/comet/contracts/Comet.sol#881-903) uses timestamp for comparisons
+	Dangerous comparisons:
+	- supplyAmount > 0 (lib/comet/contracts/Comet.sol#900)
+Comet.supplyCollateral(address,address,address,uint128) (lib/comet/contracts/Comet.sol#908-925) uses timestamp for comparisons
+	Dangerous comparisons:
+	- totals.totalSupplyAsset > assetInfo.supplyCap (lib/comet/contracts/Comet.sol#914)
+Comet.transferInternal(address,address,address,address,uint256) (lib/comet/contracts/Comet.sol#975-988) uses timestamp for comparisons
+	Dangerous comparisons:
+	- amount == type()(uint256).max (lib/comet/contracts/Comet.sol#981)
+Comet.transferBase(address,address,uint256) (lib/comet/contracts/Comet.sol#993-1028) uses timestamp for comparisons
+	Dangerous comparisons:
+	- srcBalance < 0 (lib/comet/contracts/Comet.sol#1016)
+	- uint256(- srcBalance) < baseBorrowMin (lib/comet/contracts/Comet.sol#1017)
+	- withdrawAmount > 0 (lib/comet/contracts/Comet.sol#1021)
+	- supplyAmount > 0 (lib/comet/contracts/Comet.sol#1025)
+Comet.withdrawInternal(address,address,address,address,uint256) (lib/comet/contracts/Comet.sol#1086-1098) uses timestamp for comparisons
+	Dangerous comparisons:
+	- amount == type()(uint256).max (lib/comet/contracts/Comet.sol#1091)
+Comet.withdrawBase(address,address,uint256) (lib/comet/contracts/Comet.sol#1103-1130) uses timestamp for comparisons
+	Dangerous comparisons:
+	- srcBalance < 0 (lib/comet/contracts/Comet.sol#1118)
+	- uint256(- srcBalance) < baseBorrowMin (lib/comet/contracts/Comet.sol#1119)
+	- withdrawAmount > 0 (lib/comet/contracts/Comet.sol#1127)
+Comet.absorbInternal(address,address) (lib/comet/contracts/Comet.sol#1183-1237) uses timestamp for comparisons
+	Dangerous comparisons:
+	- newBalance < 0 (lib/comet/contracts/Comet.sol#1213)
+	- newPrincipal > 0 (lib/comet/contracts/Comet.sol#1234)
+Comet.buyCollateral(address,uint256,uint256,address) (lib/comet/contracts/Comet.sol#1247-1266) uses timestamp for comparisons
+	Dangerous comparisons:
+	- reserves >= 0 && uint256(reserves) >= targetReserves (lib/comet/contracts/Comet.sol#1251)
+	- collateralAmount < minAmount (lib/comet/contracts/Comet.sol#1257)
+	- collateralAmount > getCollateralReserves(asset) (lib/comet/contracts/Comet.sol#1258)
+Comet.withdrawReserves(address,uint256) (lib/comet/contracts/Comet.sol#1293-1302) uses timestamp for comparisons
+	Dangerous comparisons:
+	- reserves < 0 || amount > unsigned256(reserves) (lib/comet/contracts/Comet.sol#1297)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Detectors:
+Comet.nonReentrantBefore() (lib/comet/contracts/Comet.sol#209-220) uses assembly
+	- INLINE ASM (lib/comet/contracts/Comet.sol#212-214)
+	- INLINE ASM (lib/comet/contracts/Comet.sol#217-219)
+Comet.nonReentrantAfter() (lib/comet/contracts/Comet.sol#225-231) uses assembly
+	- INLINE ASM (lib/comet/contracts/Comet.sol#228-230)
+Comet.getPackedAssetInternal(CometConfiguration.AssetConfig[],uint256) (lib/comet/contracts/Comet.sol#253-302) uses assembly
+	- INLINE ASM (lib/comet/contracts/Comet.sol#256-258)
+Comet.doTransferIn(address,address,uint256) (lib/comet/contracts/Comet.sol#786-805) uses assembly
+	- INLINE ASM (lib/comet/contracts/Comet.sol#790-802)
+Comet.doTransferOut(address,address,uint256) (lib/comet/contracts/Comet.sol#811-828) uses assembly
+	- INLINE ASM (lib/comet/contracts/Comet.sol#814-826)
+Comet.fallback() (lib/comet/contracts/Comet.sol#1367-1377) uses assembly
+	- INLINE ASM (lib/comet/contracts/Comet.sol#1369-1376)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Comet.absorbInternal(address,address) (lib/comet/contracts/Comet.sol#1183-1237) has costly operations inside a loop:
+	- totalSupplyBase += supplyAmount (lib/comet/contracts/Comet.sol#1227)
+	Calls stack containing the loop:
+		Comet.absorb(address,address[])
+Comet.absorbInternal(address,address) (lib/comet/contracts/Comet.sol#1183-1237) has costly operations inside a loop:
+	- totalBorrowBase -= repayAmount (lib/comet/contracts/Comet.sol#1228)
+	Calls stack containing the loop:
+		Comet.absorb(address,address[])
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+INFO:Detectors:
+Comet.getAssetInfo(uint8) (lib/comet/contracts/Comet.sol#309-376) has a high cyclomatic complexity (14).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+INFO:Detectors:
+Version constraint 0.8.15 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess
+	- StorageWriteRemovalBeforeConditionalTermination
+	- AbiReencodingHeadOverflowWithStaticArrayCleanup.
+It is used by:
+	- 0.8.15 (lib/comet/contracts/Comet.sol#2)
+	- 0.8.15 (lib/comet/contracts/CometConfiguration.sol#2)
+	- 0.8.15 (lib/comet/contracts/CometCore.sol#2)
+	- 0.8.15 (lib/comet/contracts/CometMainInterface.sol#2)
+	- 0.8.15 (lib/comet/contracts/CometMath.sol#2)
+	- 0.8.15 (lib/comet/contracts/CometStorage.sol#2)
+	- 0.8.15 (lib/comet/contracts/IERC20NonStandard.sol#2)
+	- 0.8.15 (lib/comet/contracts/IPriceFeed.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Variable Comet.asset00_a (lib/comet/contracts/Comet.sol#105) is not in mixedCase
+Variable Comet.asset00_b (lib/comet/contracts/Comet.sol#106) is not in mixedCase
+Variable Comet.asset01_a (lib/comet/contracts/Comet.sol#107) is not in mixedCase
+Variable Comet.asset01_b (lib/comet/contracts/Comet.sol#108) is not in mixedCase
+Variable Comet.asset02_a (lib/comet/contracts/Comet.sol#109) is not in mixedCase
+Variable Comet.asset02_b (lib/comet/contracts/Comet.sol#110) is not in mixedCase
+Variable Comet.asset03_a (lib/comet/contracts/Comet.sol#111) is not in mixedCase
+Variable Comet.asset03_b (lib/comet/contracts/Comet.sol#112) is not in mixedCase
+Variable Comet.asset04_a (lib/comet/contracts/Comet.sol#113) is not in mixedCase
+Variable Comet.asset04_b (lib/comet/contracts/Comet.sol#114) is not in mixedCase
+Variable Comet.asset05_a (lib/comet/contracts/Comet.sol#115) is not in mixedCase
+Variable Comet.asset05_b (lib/comet/contracts/Comet.sol#116) is not in mixedCase
+Variable Comet.asset06_a (lib/comet/contracts/Comet.sol#117) is not in mixedCase
+Variable Comet.asset06_b (lib/comet/contracts/Comet.sol#118) is not in mixedCase
+Variable Comet.asset07_a (lib/comet/contracts/Comet.sol#119) is not in mixedCase
+Variable Comet.asset07_b (lib/comet/contracts/Comet.sol#120) is not in mixedCase
+Variable Comet.asset08_a (lib/comet/contracts/Comet.sol#121) is not in mixedCase
+Variable Comet.asset08_b (lib/comet/contracts/Comet.sol#122) is not in mixedCase
+Variable Comet.asset09_a (lib/comet/contracts/Comet.sol#123) is not in mixedCase
+Variable Comet.asset09_b (lib/comet/contracts/Comet.sol#124) is not in mixedCase
+Variable Comet.asset10_a (lib/comet/contracts/Comet.sol#125) is not in mixedCase
+Variable Comet.asset10_b (lib/comet/contracts/Comet.sol#126) is not in mixedCase
+Variable Comet.asset11_a (lib/comet/contracts/Comet.sol#127) is not in mixedCase
+Variable Comet.asset11_b (lib/comet/contracts/Comet.sol#128) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+CometCore.PRICE_SCALE (lib/comet/contracts/CometCore.sol#54) is never used in Comet (lib/comet/contracts/Comet.sol#13-1379)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-state-variable
+INFO:Slither:lib/comet/contracts/Comet.sol analyzed (8 contracts with 100 detectors), 80 result(s) found
