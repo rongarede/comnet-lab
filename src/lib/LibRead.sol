@@ -2,11 +2,20 @@
 pragma solidity 0.8.20;
 
 interface IRead {
-    function accounting() external view returns (uint256 cash, uint256 borrows, uint256 reserves, uint8 baseDecimals);
+    /// @notice Get accounting information for the protocol
+    /// @return cash Total cash available in the protocol
+    /// @return borrows Total amount borrowed from the protocol
+    /// @return reserves Total reserves held by the protocol
+    /// @return baseDecimals Decimal places of the base token
+    function accounting() external returns (uint256 cash, uint256 borrows, uint256 reserves, uint8 baseDecimals);
+
+    /// @notice Get the on-chain balance of the base token
+    /// @return balance Current balance of the base token
+    /// @return baseDecimals Decimal places of the base token
     function onchainBaseBalance() external view returns (uint256 balance, uint8 baseDecimals);
     function indices() external view returns (uint256 supplyIndex, uint256 borrowIndex);
     function utilization() external view returns (uint256 u1e18);
-    function priceOf(address asset) external view returns (uint256 price, uint8 scale);
+    function priceOf(address asset) external returns (uint256 price, uint8 scale);
     function userBasic(address user) external view returns (uint256 baseDebt, uint256 baseSupply, uint256 hf1e18);
     function userCollateral(address user, address asset)
         external
@@ -17,12 +26,23 @@ interface IRead {
 }
 
 contract LibRead is IRead {
-    // TODO: Connect to actual Comet contract's totalsBasic() for cash/borrows/reserves
-    function accounting() external pure returns (uint256 cash, uint256 borrows, uint256 reserves, uint8 baseDecimals) {
+    // Events for LibRead contract
+    event PriceRequested(address indexed asset, uint256 price, uint8 scale);
+    event AccountingQueried(uint256 cash, uint256 borrows, uint256 reserves);
+    /// @notice Get accounting information for the protocol
+    /// @dev TODO: Connect to actual Comet contract's totalsBasic() for cash/borrows/reserves
+    /// @return cash Total cash available in the protocol
+    /// @return borrows Total amount borrowed from the protocol
+    /// @return reserves Total reserves held by the protocol
+    /// @return baseDecimals Decimal places of the base token
+
+    function accounting() external returns (uint256 cash, uint256 borrows, uint256 reserves, uint8 baseDecimals) {
         cash = 1000000e6; // 1M USDC (6 decimals)
         borrows = 800000e6; // 800K USDC borrowed
         reserves = 50000e6; // 50K USDC reserves
         baseDecimals = 6; // USDC decimals
+
+        emit AccountingQueried(cash, borrows, reserves);
     }
 
     // TODO: Connect to actual base token balanceOf(comet)
@@ -42,11 +62,18 @@ contract LibRead is IRead {
         u1e18 = 8e17; // 80% utilization (18 decimals)
     }
 
-    // TODO: Connect to Comet's getPrice() - typically returns 8 decimal USD price
-    function priceOf(address asset) external pure returns (uint256 price, uint8 scale) {
+    /// @notice Get price information for a specific asset
+    /// @dev TODO: Connect to Comet's getPrice() - typically returns 8 decimal USD price
+    /// @param asset The address of the asset to get price for
+    /// @return price The USD price of the asset
+    /// @return scale The decimal scale of the price
+    function priceOf(address asset) external returns (uint256 price, uint8 scale) {
+        require(asset != address(0), "ZERO_ADDRESS");
         asset; // silence unused warning
         price = 1e8; // $1.00 USD price (8 decimals)
         scale = 8; // Price scale factor
+
+        emit PriceRequested(asset, price, scale);
     }
 
     // TODO: Connect to Comet's userBasic() for principal/present value calculations
