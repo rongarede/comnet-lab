@@ -15,16 +15,18 @@ contract AutoScanTest is Test {
     }
 
     function testPriceOfRevertsWithZeroAddress() public {
-        vm.expectRevert("ZERO_ADDRESS");
+        vm.expectRevert(bytes("ZERO_ADDRESS"));
         libRead.priceOf(address(0));
     }
 
     function testPriceOfEmitsEvent() public {
         address asset = address(0x123);
 
+        // Expect the event to be emitted
         vm.expectEmit(true, false, false, true);
         emit PriceRequested(asset, 1e8, 8);
-
+        
+        // Call the function which will emit the event
         (uint256 price, uint8 scale) = libRead.priceOf(asset);
 
         assertEq(price, 1e8);
@@ -32,9 +34,11 @@ contract AutoScanTest is Test {
     }
 
     function testAccountingEmitsEvent() public {
+        // Expect the event to be emitted
         vm.expectEmit(false, false, false, true);
         emit AccountingQueried(1000000e6, 800000e6, 50000e6);
-
+        
+        // Call the function which will emit the event
         (uint256 cash, uint256 borrows, uint256 reserves, uint8 baseDecimals) = libRead.accounting();
 
         assertEq(cash, 1000000e6);
