@@ -9,17 +9,17 @@ contract InvariantSmoke is Test {
 
     // TODO: Replace with actual asset addresses when connecting to mainnet
     address constant USDC = 0xA0b86a33E6441E81f39Fe7e8E1C0C50f63c9f98d; // placeholder
-    address constant WETH = 0x4200000000000000000000000000000000000006; // placeholder  
+    address constant WETH = 0x4200000000000000000000000000000000000006; // placeholder
     address constant WBTC = 0x68f180fcCe6836688e9084f035309E29Bf0A2095; // placeholder
 
     function setUp() external {
         // TODO: Day2 will replace LibRead with actual Comet adapter
         R = new LibRead();
-        
+
         // TODO: Initialize Handler with actors and assets:
         // handler.setActors([alice, bob, charlie]);
         // handler.setAssets(USDC, [WETH, WBTC]);
-        
+
         // TODO: Configure invariant testing:
         // targetContract(address(handler));
         // targetSelector(FuzzSelector({addr: address(handler), selectors: bytes4[](handler.supply.selector, handler.withdraw.selector)}));

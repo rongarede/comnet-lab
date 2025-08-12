@@ -1,0 +1,63 @@
+strict digraph {
+    rankdir="LR"
+    node [shape=box]
+    
+    subgraph cluster_Comet {
+        label = "Comet Core Functions"
+        
+        // Supply operations
+        supply [label="supply"]
+        supplyTo [label="supplyTo"] 
+        supplyFrom [label="supplyFrom"]
+        supplyInternal [label="supplyInternal"]
+        supplyBase [label="supplyBase"]
+        supplyCollateral [label="supplyCollateral"]
+        
+        // Withdraw operations  
+        withdraw [label="withdraw"]
+        withdrawTo [label="withdrawTo"]
+        withdrawFrom [label="withdrawFrom"]
+        withdrawInternal [label="withdrawInternal"]
+        withdrawBase [label="withdrawBase"]
+        withdrawCollateral [label="withdrawCollateral"]
+        withdrawReserves [label="withdrawReserves"]
+        
+        // Borrow operations
+        borrowBalanceOf [label="borrowBalanceOf"]
+        repayAndSupplyAmount [label="repayAndSupplyAmount"]
+        withdrawAndBorrowAmount [label="withdrawAndBorrowAmount"]
+        
+        // Interest accrual
+        accrueAccount [label="accrueAccount"]
+        accrueInternal [label="accrueInternal"] 
+        accruedInterestIndices [label="accruedInterestIndices"]
+        
+        // Liquidation
+        absorb [label="absorb"]
+        absorbInternal [label="absorbInternal"]
+        buyCollateral [label="buyCollateral"]
+        
+        // Price oracle
+        getPrice [label="getPrice"]
+    }
+    
+    // Core flow connections
+    supply -> supplyInternal
+    supplyInternal -> supplyBase
+    supplyInternal -> supplyCollateral
+    supplyTo -> supplyInternal
+    supplyFrom -> supplyInternal
+    
+    withdraw -> withdrawInternal
+    withdrawInternal -> withdrawBase
+    withdrawInternal -> withdrawCollateral
+    withdrawTo -> withdrawInternal
+    withdrawFrom -> withdrawInternal
+    
+    accrueAccount -> accrueInternal
+    accrueInternal -> accruedInterestIndices
+    
+    absorb -> absorbInternal
+    absorbInternal -> getPrice
+    buyCollateral -> getPrice
+}

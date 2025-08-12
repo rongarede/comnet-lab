@@ -1,0 +1,466 @@
+strict digraph {
+rankdir="LR"
+node [shape=box]
+subgraph cluster_5186_CometCore {
+label = "CometCore"
+"5186_hasPermission" [label="hasPermission"]
+"5186_presentValueBorrow" [label="presentValueBorrow"]
+"5186_principalValue" [label="principalValue"]
+"5186_principalValueSupply" [label="principalValueSupply"]
+"5186_presentValue" [label="presentValue"]
+"5186_presentValueSupply" [label="presentValueSupply"]
+"5186_principalValueBorrow" [label="principalValueBorrow"]
+"5186_presentValue" -> "5186_presentValueBorrow"
+"5186_presentValue" -> "5186_presentValueSupply"
+"5186_principalValueSupply" -> "5186_safe104"
+"5186_principalValue" -> "5186_principalValueSupply"
+"5186_principalValue" -> "5186_principalValueBorrow"
+"5186_principalValue" -> "5186_signed104"
+"5186_presentValue" -> "5186_signed256"
+"5186_principalValueBorrow" -> "5186_safe104"
+}subgraph cluster_4873_IERC20NonStandard {
+label = "IERC20NonStandard"
+"4873_balanceOf" [label="balanceOf"]
+"4873_transfer" [label="transfer"]
+"4873_name" [label="name"]
+"4873_approve" [label="approve"]
+"4873_decimals" [label="decimals"]
+"4873_symbol" [label="symbol"]
+"4873_transferFrom" [label="transferFrom"]
+}subgraph cluster_4905_IPriceFeed {
+label = "IPriceFeed"
+"4905_description" [label="description"]
+"4905_version" [label="version"]
+"4905_decimals" [label="decimals"]
+"4905_latestRoundData" [label="latestRoundData"]
+}subgraph cluster_4820_CometMainInterface {
+label = "CometMainInterface"
+"4820_totalSupply" [label="totalSupply"]
+"4820_approveThis" [label="approveThis"]
+"4820_quoteCollateral" [label="quoteCollateral"]
+"4820_baseToken" [label="baseToken"]
+"4820_supplyPerSecondInterestRateSlopeLow" [label="supplyPerSecondInterestRateSlopeLow"]
+"4820_transfer" [label="transfer"]
+"4820_transferAsset" [label="transferAsset"]
+"4820_borrowKink" [label="borrowKink"]
+"4820_decimals" [label="decimals"]
+"4820_baseTrackingBorrowSpeed" [label="baseTrackingBorrowSpeed"]
+"4820_transferAssetFrom" [label="transferAssetFrom"]
+"4820_accrueAccount" [label="accrueAccount"]
+"4820_getBorrowRate" [label="getBorrowRate"]
+"4820_supplyPerSecondInterestRateBase" [label="supplyPerSecondInterestRateBase"]
+"4820_pause" [label="pause"]
+"4820_transferFrom" [label="transferFrom"]
+"4820_supplyTo" [label="supplyTo"]
+"4820_supplyKink" [label="supplyKink"]
+"4820_withdraw" [label="withdraw"]
+"4820_absorb" [label="absorb"]
+"4820_baseTrackingSupplySpeed" [label="baseTrackingSupplySpeed"]
+"4820_getAssetInfo" [label="getAssetInfo"]
+"4820_withdrawReserves" [label="withdrawReserves"]
+"4820_getPrice" [label="getPrice"]
+"4820_isSupplyPaused" [label="isSupplyPaused"]
+"4820_isTransferPaused" [label="isTransferPaused"]
+"4820_isWithdrawPaused" [label="isWithdrawPaused"]
+"4820_extensionDelegate" [label="extensionDelegate"]
+"4820_governor" [label="governor"]
+"4820_borrowPerSecondInterestRateSlopeHigh" [label="borrowPerSecondInterestRateSlopeHigh"]
+"4820_baseScale" [label="baseScale"]
+"4820_isBuyPaused" [label="isBuyPaused"]
+"4820_withdrawTo" [label="withdrawTo"]
+"4820_balanceOf" [label="balanceOf"]
+"4820_trackingIndexScale" [label="trackingIndexScale"]
+"4820_getReserves" [label="getReserves"]
+"4820_withdrawFrom" [label="withdrawFrom"]
+"4820_pauseGuardian" [label="pauseGuardian"]
+"4820_isBorrowCollateralized" [label="isBorrowCollateralized"]
+"4820_borrowPerSecondInterestRateBase" [label="borrowPerSecondInterestRateBase"]
+"4820_storeFrontPriceFactor" [label="storeFrontPriceFactor"]
+"4820_baseBorrowMin" [label="baseBorrowMin"]
+"4820_borrowBalanceOf" [label="borrowBalanceOf"]
+"4820_supplyFrom" [label="supplyFrom"]
+"4820_borrowPerSecondInterestRateSlopeLow" [label="borrowPerSecondInterestRateSlopeLow"]
+"4820_buyCollateral" [label="buyCollateral"]
+"4820_numAssets" [label="numAssets"]
+"4820_isAbsorbPaused" [label="isAbsorbPaused"]
+"4820_baseMinForRewards" [label="baseMinForRewards"]
+"4820_supplyPerSecondInterestRateSlopeHigh" [label="supplyPerSecondInterestRateSlopeHigh"]
+"4820_getSupplyRate" [label="getSupplyRate"]
+"4820_totalBorrow" [label="totalBorrow"]
+"4820_getCollateralReserves" [label="getCollateralReserves"]
+"4820_getAssetInfoByAddress" [label="getAssetInfoByAddress"]
+"4820_isLiquidatable" [label="isLiquidatable"]
+"4820_supply" [label="supply"]
+"4820_getUtilization" [label="getUtilization"]
+"4820_targetReserves" [label="targetReserves"]
+"4820_initializeStorage" [label="initializeStorage"]
+"4820_baseTokenPriceFeed" [label="baseTokenPriceFeed"]
+}subgraph cluster_5463_CometMath {
+label = "CometMath"
+"5463_safe64" [label="safe64"]
+"5463_signed256" [label="signed256"]
+"5463_toUInt8" [label="toUInt8"]
+"5463_unsigned256" [label="unsigned256"]
+"5463_unsigned104" [label="unsigned104"]
+"5463_signed104" [label="signed104"]
+"5463_safe104" [label="safe104"]
+"5463_safe128" [label="safe128"]
+"5463_toBool" [label="toBool"]
+}subgraph cluster_4249_Comet {
+label = "Comet"
+"4249_isSupplyPaused" [label="isSupplyPaused"]
+"4249_pause" [label="pause"]
+"4249_doTransferIn" [label="doTransferIn"]
+"4249_isAbsorbPaused" [label="isAbsorbPaused"]
+"4249_getBorrowRate" [label="getBorrowRate"]
+"4249_getAssetInfo" [label="getAssetInfo"]
+"4249_isLiquidatable" [label="isLiquidatable"]
+"4249_buyCollateral" [label="buyCollateral"]
+"4249_divPrice" [label="divPrice"]
+"4249_repayAndSupplyAmount" [label="repayAndSupplyAmount"]
+"4249_isBuyPaused" [label="isBuyPaused"]
+"4249_isWithdrawPaused" [label="isWithdrawPaused"]
+"4249_mulFactor" [label="mulFactor"]
+"4249_isBorrowCollateralized" [label="isBorrowCollateralized"]
+"4249_withdrawAndBorrowAmount" [label="withdrawAndBorrowAmount"]
+"4249_supplyBase" [label="supplyBase"]
+"4249_fallback" [label="fallback"]
+"4249_withdrawBase" [label="withdrawBase"]
+"4249_getReserves" [label="getReserves"]
+"4249_withdrawFrom" [label="withdrawFrom"]
+"4249_nonReentrantAfter" [label="nonReentrantAfter"]
+"4249_accrueInternal" [label="accrueInternal"]
+"4249_getPrice" [label="getPrice"]
+"4249_totalBorrow" [label="totalBorrow"]
+"4249_approveThis" [label="approveThis"]
+"4249_nonReentrantBefore" [label="nonReentrantBefore"]
+"4249_isInAsset" [label="isInAsset"]
+"4249_accrueAccount" [label="accrueAccount"]
+"4249_transferFrom" [label="transferFrom"]
+"4249_getCollateralReserves" [label="getCollateralReserves"]
+"4249_absorbInternal" [label="absorbInternal"]
+"4249_balanceOf" [label="balanceOf"]
+"4249_supplyFrom" [label="supplyFrom"]
+"4249_getUtilization" [label="getUtilization"]
+"4249_divBaseWei" [label="divBaseWei"]
+"4249_getAssetInfoByAddress" [label="getAssetInfoByAddress"]
+"4249_signedMulPrice" [label="signedMulPrice"]
+"4249_updateAssetsIn" [label="updateAssetsIn"]
+"4249_quoteCollateral" [label="quoteCollateral"]
+"4249_transferBase" [label="transferBase"]
+"4249_transfer" [label="transfer"]
+"4249_supplyTo" [label="supplyTo"]
+"4249_constructor" [label="constructor"]
+"4249_supply" [label="supply"]
+"4249_getNowInternal" [label="getNowInternal"]
+"4249_doTransferOut" [label="doTransferOut"]
+"4249_withdrawTo" [label="withdrawTo"]
+"4249_borrowBalanceOf" [label="borrowBalanceOf"]
+"4249_supplyInternal" [label="supplyInternal"]
+"4249_updateBasePrincipal" [label="updateBasePrincipal"]
+"4249_transferInternal" [label="transferInternal"]
+"4249_supplyCollateral" [label="supplyCollateral"]
+"4249_absorb" [label="absorb"]
+"4249_transferAssetFrom" [label="transferAssetFrom"]
+"4249_mulPrice" [label="mulPrice"]
+"4249_withdrawCollateral" [label="withdrawCollateral"]
+"4249_accruedInterestIndices" [label="accruedInterestIndices"]
+"4249_initializeStorage" [label="initializeStorage"]
+"4249_withdrawReserves" [label="withdrawReserves"]
+"4249_withdraw" [label="withdraw"]
+"4249_getPackedAssetInternal" [label="getPackedAssetInternal"]
+"4249_transferCollateral" [label="transferCollateral"]
+"4249_transferAsset" [label="transferAsset"]
+"4249_totalSupply" [label="totalSupply"]
+"4249_withdrawInternal" [label="withdrawInternal"]
+"4249_isTransferPaused" [label="isTransferPaused"]
+"4249_getSupplyRate" [label="getSupplyRate"]
+"4249_supplyCollateral" -> "4249_getAssetInfoByAddress"
+"4249_getReserves" -> "4249_getNowInternal"
+"4249_absorbInternal" -> "4249_signed256"
+"4249_getBorrowRate" -> "4249_mulFactor"
+"4249_isLiquidatable" -> "4249_mulPrice"
+"4249_withdraw" -> "4249_withdrawInternal"
+"4249_signedMulPrice" -> "4249_signed256"
+"4249_getReserves" -> "4249_presentValueBorrow"
+"4249_transferAsset" -> "4249_transferInternal"
+"4249_withdrawInternal" -> "4249_isWithdrawPaused"
+"4249_isSupplyPaused" -> "4249_toBool"
+"4249_supplyBase" -> "4249_doTransferIn"
+"4249_buyCollateral" -> "4249_isBuyPaused"
+"4249_transferBase" -> "4249_repayAndSupplyAmount"
+"4249_supplyTo" -> "4249_supplyInternal"
+"4249_initializeStorage" -> "4249_getNowInternal"
+"4249_buyCollateral" -> "4249_getCollateralReserves"
+"4249_supplyBase" -> "4249_repayAndSupplyAmount"
+"4249_withdrawReserves" -> "4249_getReserves"
+"4249_absorb" -> "4249_isAbsorbPaused"
+"4249_withdrawBase" -> "4249_principalValue"
+"4249_accrueAccount" -> "4249_accrueInternal"
+"4249_buyCollateral" -> "4249_safe128"
+"4249_withdrawBase" -> "4249_isBorrowCollateralized"
+"4249_withdrawBase" -> "4249_presentValue"
+"4249_supplyBase" -> "4249_updateBasePrincipal"
+"4249_transferFrom" -> "4249_transferInternal"
+"4249_borrowBalanceOf" -> "4249_unsigned104"
+"4249_supplyBase" -> "4249_accrueInternal"
+"4249_withdrawCollateral" -> "4249_updateAssetsIn"
+"4249_accruedInterestIndices" -> "4249_safe64"
+"4249_totalSupply" -> "4249_presentValueSupply"
+"4249_buyCollateral" -> "4249_doTransferOut"
+"4249_transferBase" -> "4249_presentValueSupply"
+"4249_isBorrowCollateralized" -> "4249_signedMulPrice"
+"4249_supplyInternal" -> "4249_supplyBase"
+"4249_accrueAccount" -> "4249_updateBasePrincipal"
+"4249_buyCollateral" -> "4249_nonReentrant"
+"4249_absorbInternal" -> "4249_getAssetInfo"
+"4249_absorbInternal" -> "4249_repayAndSupplyAmount"
+"4249_getUtilization" -> "4249_presentValueSupply"
+"4249_isLiquidatable" -> "4249_signed256"
+"4249_absorb" -> "4249_safe64"
+"4249_supplyInternal" -> "4249_nonReentrant"
+"4249_quoteCollateral" -> "4249_mulFactor"
+"4249_transferBase" -> "4249_isBorrowCollateralized"
+"4249_supply" -> "4249_supplyInternal"
+"4249_withdrawInternal" -> "4249_hasPermission"
+"4249_absorbInternal" -> "4249_isInAsset"
+"4249_supplyBase" -> "4249_presentValue"
+"4249_getBorrowRate" -> "4249_safe64"
+"4249_absorbInternal" -> "4249_unsigned256"
+"4249_absorbInternal" -> "4249_mulFactor"
+"4249_transferBase" -> "4249_accrueInternal"
+"4249_balanceOf" -> "4249_getNowInternal"
+"4249_withdrawBase" -> "4249_updateBasePrincipal"
+"4249_withdrawCollateral" -> "4249_doTransferOut"
+"4249_transferInternal" -> "4249_transferBase"
+"4249_withdrawBase" -> "4249_withdrawAndBorrowAmount"
+"4249_absorbInternal" -> "4249_getPrice"
+"4249_accrueInternal" -> "4249_divBaseWei"
+"4249_supplyBase" -> "4249_presentValueSupply"
+"4249_totalBorrow" -> "4249_getNowInternal"
+"4249_isLiquidatable" -> "4249_isInAsset"
+"4249_supplyCollateral" -> "4249_updateAssetsIn"
+"4249_supplyFrom" -> "4249_supplyInternal"
+"4249_pause" -> "4249_toUInt8"
+"4249_absorbInternal" -> "4249_unsigned104"
+"4249_isBorrowCollateralized" -> "4249_mulFactor"
+"4249_transferInternal" -> "4249_balanceOf"
+"4249_isBorrowCollateralized" -> "4249_mulPrice"
+"4249_getSupplyRate" -> "4249_mulFactor"
+"4249_withdrawInternal" -> "4249_safe128"
+"4249_absorbInternal" -> "4249_isLiquidatable"
+"4249_withdrawInternal" -> "4249_balanceOf"
+"4249_withdrawBase" -> "4249_doTransferOut"
+"4249_accruedInterestIndices" -> "4249_mulFactor"
+"4249_accruedInterestIndices" -> "4249_getSupplyRate"
+"4249_transferBase" -> "4249_withdrawAndBorrowAmount"
+"4249_updateBasePrincipal" -> "4249_safe64"
+"4249_isTransferPaused" -> "4249_toBool"
+"4249_transferAssetFrom" -> "4249_transferInternal"
+"4249_balanceOf" -> "4249_accruedInterestIndices"
+"4249_buyCollateral" -> "4249_quoteCollateral"
+"4249_transferInternal" -> "4249_nonReentrant"
+"4249_supplyBase" -> "4249_principalValue"
+"4249_borrowBalanceOf" -> "4249_getNowInternal"
+"4249_absorbInternal" -> "4249_divPrice"
+"4249_accrueInternal" -> "4249_getNowInternal"
+"4249_supplyCollateral" -> "4249_doTransferIn"
+"4249_absorbInternal" -> "4249_presentValueSupply"
+"4249_withdrawTo" -> "4249_withdrawInternal"
+"4249_constructor" -> "4249_getPackedAssetInternal"
+"4249_transferInternal" -> "4249_transferCollateral"
+"4249_isAbsorbPaused" -> "4249_toBool"
+"4249_totalSupply" -> "4249_accruedInterestIndices"
+"4249_withdrawInternal" -> "4249_nonReentrant"
+"4249_withdrawBase" -> "4249_signed256"
+"4249_isBorrowCollateralized" -> "4249_getAssetInfo"
+"4249_absorbInternal" -> "4249_mulPrice"
+"4249_isLiquidatable" -> "4249_presentValue"
+"4249_transferBase" -> "4249_updateBasePrincipal"
+"4249_accrueInternal" -> "4249_safe64"
+"4249_transferBase" -> "4249_presentValue"
+"4249_getSupplyRate" -> "4249_safe64"
+"4249_isBorrowCollateralized" -> "4249_signed256"
+"4249_getReserves" -> "4249_presentValueSupply"
+"4249_accrueInternal" -> "4249_accruedInterestIndices"
+"4249_buyCollateral" -> "4249_getReserves"
+"4249_supplyInternal" -> "4249_borrowBalanceOf"
+"4249_borrowBalanceOf" -> "4249_presentValueBorrow"
+"4249_withdrawBase" -> "4249_presentValueSupply"
+"4249_balanceOf" -> "4249_presentValueSupply"
+"4249_accruedInterestIndices" -> "4249_getBorrowRate"
+"4249_getUtilization" -> "4249_presentValueBorrow"
+"4249_transfer" -> "4249_transferInternal"
+"4249_quoteCollateral" -> "4249_getAssetInfoByAddress"
+"4249_getReserves" -> "4249_accruedInterestIndices"
+"4249_getAssetInfoByAddress" -> "4249_getAssetInfo"
+"4249_transferBase" -> "4249_principalValue"
+"4249_isLiquidatable" -> "4249_signedMulPrice"
+"4249_withdrawBase" -> "4249_accrueInternal"
+"4249_supplyBase" -> "4249_signed256"
+"4249_withdrawFrom" -> "4249_withdrawInternal"
+"4249_withdrawCollateral" -> "4249_getAssetInfoByAddress"
+"4249_isWithdrawPaused" -> "4249_toBool"
+"4249_accruedInterestIndices" -> "4249_getUtilization"
+"4249_isBorrowCollateralized" -> "4249_presentValue"
+"4249_balanceOf" -> "4249_unsigned104"
+"4249_withdrawInternal" -> "4249_withdrawCollateral"
+"4249_totalBorrow" -> "4249_presentValueBorrow"
+"4249_isLiquidatable" -> "4249_getPrice"
+"4249_isBuyPaused" -> "4249_toBool"
+"4249_isLiquidatable" -> "4249_getAssetInfo"
+"4249_absorbInternal" -> "4249_updateBasePrincipal"
+"4249_quoteCollateral" -> "4249_getPrice"
+"4249_transferCollateral" -> "4249_getAssetInfoByAddress"
+"4249_totalSupply" -> "4249_getNowInternal"
+"4249_absorb" -> "4249_accrueInternal"
+"4249_borrowBalanceOf" -> "4249_accruedInterestIndices"
+"4249_transferCollateral" -> "4249_updateAssetsIn"
+"4249_withdrawCollateral" -> "4249_isBorrowCollateralized"
+"4249_withdrawReserves" -> "4249_doTransferOut"
+"4249_isLiquidatable" -> "4249_mulFactor"
+"4249_transferInternal" -> "4249_safe128"
+"4249_totalBorrow" -> "4249_accruedInterestIndices"
+"4249_transferBase" -> "4249_signed256"
+"4249_absorbInternal" -> "4249_presentValue"
+"4249_isBorrowCollateralized" -> "4249_getPrice"
+"4249_transferInternal" -> "4249_hasPermission"
+"4249_supplyCollateral" -> "4249_safe128"
+"4249_isBorrowCollateralized" -> "4249_isInAsset"
+"4249_transferCollateral" -> "4249_isBorrowCollateralized"
+"4249_supplyInternal" -> "4249_isSupplyPaused"
+"4249_transferInternal" -> "4249_isTransferPaused"
+"4249_supplyInternal" -> "4249_safe128"
+"4249_absorbInternal" -> "4249_principalValue"
+"4249_supplyInternal" -> "4249_hasPermission"
+"4249_withdrawInternal" -> "4249_withdrawBase"
+"4249_absorb" -> "4249_safe128"
+"4249_getReserves" -> "4249_signed256"
+"4249_supplyInternal" -> "4249_supplyCollateral"
+"4249_withdrawReserves" -> "4249_unsigned256"
+"4249_absorb" -> "4249_absorbInternal"
+"4249_buyCollateral" -> "4249_doTransferIn"
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"revert InvalidInt256()" 
+"calldatasize()" 
+"calldatacopy(uint256,uint256,uint256)" 
+"gas()" 
+"mload(uint256)" 
+"revert BadAsset()" 
+"revert BadMinimum()" 
+"returndatacopy(uint256,uint256,uint256)" 
+"delegatecall(uint256,uint256,uint256,uint256,uint256,uint256)" 
+"revert InsufficientReserves()" 
+"revert BadDiscount()" 
+"revert BadPrice()" 
+"revert InvalidUInt64()" 
+"revert(uint256,uint256)" 
+"revert ReentrantCallBlocked()" 
+"revert LiquidateCFTooLarge()" 
+"revert TooMuchSlippage()" 
+"revert Paused()" 
+"revert NegativeNumber()" 
+"revert BadDecimals()" 
+"sstore(uint256,uint256)" 
+"return(uint256,uint256)" 
+"revert TransferOutFailed()" 
+"gasleft()" 
+"revert NotCollateralized()" 
+"revert SupplyCapExceeded()" 
+"revert NotLiquidatable()" 
+"revert InvalidInt104()" 
+"revert InvalidUInt104()" 
+"returndatasize()" 
+"revert InvalidUInt128()" 
+"revert BorrowCFTooLarge()" 
+"revert TimestampTooLarge()" 
+"revert AlreadyInitialized()" 
+"revert TooManyAssets()" 
+"revert Absurd()" 
+"sload(uint256)" 
+"revert NotForSale()" 
+"revert BorrowTooSmall()" 
+"revert TransferInFailed()" 
+"revert Unauthorized()" 
+"revert NoSelfTransfer()" 
+"4249_approveThis" -> "revert Unauthorized()"
+"4249_supplyCollateral" -> "revert SupplyCapExceeded()"
+"4249_buyCollateral" -> "revert TooMuchSlippage()"
+"4249_getPackedAssetInternal" -> "revert LiquidateCFTooLarge()"
+"4249_transferInternal" -> "revert NoSelfTransfer()"
+"5463_safe104" -> "revert InvalidUInt104()"
+"4249_doTransferOut" -> "revert TransferOutFailed()"
+"4249_doTransferIn" -> "revert TransferInFailed()"
+"4249_absorbInternal" -> "revert NotLiquidatable()"
+"4249_nonReentrantAfter" -> "sstore(uint256,uint256)"
+"4249_doTransferOut" -> "returndatasize()"
+"4249_getPrice" -> "revert BadPrice()"
+"4249_withdrawBase" -> "revert BorrowTooSmall()"
+"5463_safe128" -> "revert InvalidUInt128()"
+"4249_fallback" -> "delegatecall(uint256,uint256,uint256,uint256,uint256,uint256)"
+"4249_constructor" -> "revert BadDecimals()"
+"4249_nonReentrantBefore" -> "revert ReentrantCallBlocked()"
+"4249_fallback" -> "returndatacopy(uint256,uint256,uint256)"
+"4249_buyCollateral" -> "revert InsufficientReserves()"
+"4249_supplyInternal" -> "revert Paused()"
+"4249_withdrawBase" -> "revert NotCollateralized()"
+"4249_absorb" -> "revert Paused()"
+"4249_transferInternal" -> "revert Paused()"
+"4249_doTransferOut" -> "revert(uint256,uint256)"
+"4249_fallback" -> "gas()"
+"4249_doTransferOut" -> "returndatacopy(uint256,uint256,uint256)"
+"4249_getNowInternal" -> "revert TimestampTooLarge()"
+"4249_getAssetInfo" -> "revert Absurd()"
+"4249_nonReentrantBefore" -> "sload(uint256)"
+"4249_transferCollateral" -> "revert NotCollateralized()"
+"4249_withdrawInternal" -> "revert Unauthorized()"
+"4249_withdrawReserves" -> "revert InsufficientReserves()"
+"5463_signed256" -> "revert InvalidInt256()"
+"5463_unsigned104" -> "revert NegativeNumber()"
+"4249_fallback" -> "revert(uint256,uint256)"
+"4249_pause" -> "revert Unauthorized()"
+"5463_signed104" -> "revert InvalidInt104()"
+"4249_getAssetInfoByAddress" -> "revert BadAsset()"
+"4249_buyCollateral" -> "revert Paused()"
+"4249_doTransferIn" -> "returndatasize()"
+"4249_fallback" -> "calldatacopy(uint256,uint256,uint256)"
+"4249_constructor" -> "revert TooManyAssets()"
+"4249_constructor" -> "revert BadMinimum()"
+"4249_buyCollateral" -> "revert NotForSale()"
+"4249_transferInternal" -> "revert Unauthorized()"
+"5463_safe64" -> "revert InvalidUInt64()"
+"4249_constructor" -> "revert BadDiscount()"
+"4249_doTransferIn" -> "returndatacopy(uint256,uint256,uint256)"
+"4249_withdrawReserves" -> "revert Unauthorized()"
+"4249_getAssetInfo" -> "revert BadAsset()"
+"4249_fallback" -> "calldatasize()"
+"4249_getPackedAssetInternal" -> "revert BadDecimals()"
+"4249_getPackedAssetInternal" -> "mload(uint256)"
+"4249_transferBase" -> "revert BorrowTooSmall()"
+"4249_transferBase" -> "revert NotCollateralized()"
+"4249_getPackedAssetInternal" -> "revert BorrowCFTooLarge()"
+"4249_fallback" -> "returndatasize()"
+"5463_unsigned256" -> "revert NegativeNumber()"
+"4249_doTransferIn" -> "mload(uint256)"
+"4249_fallback" -> "return(uint256,uint256)"
+"4249_initializeStorage" -> "revert AlreadyInitialized()"
+"4249_supplyInternal" -> "revert Unauthorized()"
+"4249_withdrawInternal" -> "revert Paused()"
+"4249_doTransferIn" -> "revert(uint256,uint256)"
+"4249_nonReentrantBefore" -> "sstore(uint256,uint256)"
+"4249_doTransferOut" -> "mload(uint256)"
+"4249_withdrawCollateral" -> "revert NotCollateralized()"
+"4249_absorb" -> "gasleft()"
+}"4249_constructor" -> "4873_decimals"
+"4249_getCollateralReserves" -> "4873_balanceOf"
+"4249_getReserves" -> "4873_balanceOf"
+"4249_doTransferIn" -> "4873_balanceOf"
+"4249_approveThis" -> "4873_approve"
+"4249_getPrice" -> "4905_latestRoundData"
+"4249_doTransferOut" -> "4873_transfer"
+"4249_doTransferIn" -> "4873_transferFrom"
+"4249_getPackedAssetInternal" -> "4905_decimals"
+"4249_getPackedAssetInternal" -> "4873_decimals"
+"4249_constructor" -> "4905_decimals"
+}

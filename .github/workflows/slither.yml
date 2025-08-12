@@ -1,0 +1,175 @@
+name: Slither Security Analysis
+
+# 触发条件：push 和 pull_request
+on:
+  push:
+    branches: [ main, master, develop, chore/* ]
+    paths:
+      - 'src/**/*.sol'
+      - 'foundry.toml'
+      - '.github/workflows/slither.yml'
+  pull_request:
+    branches: [ main, master, develop ]
+    paths:
+      - 'src/**/*.sol'
+      - 'foundry.toml'
+      - '.github/workflows/slither.yml'
+
+# 权限设置
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  slither-analyze:
+    runs-on: ubuntu-latest
+    name: Run Slither Analysis
+    
+    steps:
+      # 步骤1: 检出代码仓库（包含所有子模块）
+      - name: Checkout repository with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      # 步骤2: 安装Foundry工具链（使用stable版本与本地一致）
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      # 步骤3: 运行forge build作为sanity check
+      - name: Build contracts (sanity check)
+        run: |
+          echo "=== Foundry Configuration ==="
+          forge --version
+          forge config
+          echo "=== Building contracts ==="
+          forge clean
+          forge build --sizes
+
+      # 步骤4: 安装Python环境
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 步骤5: 安装pipx并用其安装Slither
+      - name: Install Slither with pipx
+        run: |
+          echo "=== Installing pipx ==="
+          python -m pip install --user pipx
+          python -m pipx ensurepath
+          # 添加pipx路径到GitHub Actions PATH
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          
+          echo "=== Installing Slither with pipx ==="
+          pipx install slither-analyzer==0.11.3
+          pipx inject slither-analyzer crytic-compile
+          
+          echo "=== Verifying installation ==="
+          slither --version
+
+      # 步骤6: 运行Slither安全分析
+      - name: Run Slither analysis
+        id: slither
+        run: |
+          set -euo pipefail
+          mkdir -p tools reports
+          # 清理旧报告，避免 overwrite 提示
+          rm -f tools/slither-report.json tools/slither-report.sarif
+
+          echo "=== Running Slither Security Analysis ==="
+          slither . \
+            --compile-force-framework foundry \
+            --filter-paths '(^|/)(lib|node_modules|test|mocks)(/|$)' \
+            --json tools/slither-report.json \
+            --sarif tools/slither-report.sarif \
+            --exclude-optimization
+
+          echo "=== Analysis Complete ==="
+          ls -la tools/
+          # 报告文件校验
+          test -s tools/slither-report.json
+          test -s tools/slither-report.sarif
+
+          # 使用 jq 输出摘要，失败不致命
+          echo "=== Security Findings Summary (SARIF) ==="
+          jq -r 'if (.runs|length>0 and .runs[0].results) then "findings=\(.runs[0].results|length)" else "findings=0" end' tools/slither-report.sarif || echo "findings=unknown"
+
+      # 步骤7: 上传SARIF到GitHub Code Scanning（仅在Slither成功时）
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: steps.slither.outcome == 'success'
+        with:
+          sarif_file: tools/slither-report.sarif
+          category: slither
+
+      # 步骤8: 保存报告作为构建产物（总是执行以便调试）
+      - name: Upload scan reports as artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: slither-reports-${{ github.run_number }}
+          path: |
+            tools/slither-report.json
+            tools/slither-report.sarif
+          retention-days: 30
+
+      # 步骤9: 生成PR评论（仅在PR且Slither成功时）
+      - name: Comment PR with results
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request' && steps.slither.outcome == 'success'
+        with:
+          script: |
+            const fs = require('fs');
+            
+            try {
+              // 读取JSON报告
+              const jsonReport = JSON.parse(fs.readFileSync('tools/slither-report.json', 'utf8'));
+              const detectors = jsonReport.results?.detectors || [];
+              
+              // 统计各严重程度的发现
+              const severity = { High: 0, Medium: 0, Low: 0, Informational: 0 };
+              detectors.forEach(d => {
+                const impact = d.impact || 'Informational';
+                severity[impact] = (severity[impact] || 0) + 1;
+              });
+              
+              const total = Object.values(severity).reduce((a, b) => a + b, 0);
+              
+              // 构建PR评论
+              let comment = `## 🔒 Slither Security Analysis Results\n\n`;
+              comment += `**Summary:** ${total} total findings\n\n`;
+              comment += `| Severity | Count |\n`;
+              comment += `|----------|-------|\n`;
+              comment += `| 🔴 High | ${severity.High} |\n`;
+              comment += `| 🟡 Medium | ${severity.Medium} |\n`;
+              comment += `| 🟠 Low | ${severity.Low} |\n`;
+              comment += `| ℹ️ Info | ${severity.Informational} |\n\n`;
+              
+              if (total === 0) {
+                comment += `✅ **No security issues detected!**\n\n`;
+              } else {
+                comment += `⚠️ **Please review security findings in the Code Scanning tab.**\n\n`;
+              }
+              
+              comment += `📊 [View detailed results](${context.payload.repository.html_url}/security/code-scanning)\n\n`;
+              comment += `🔗 [Download reports](${context.payload.repository.html_url}/actions/runs/${context.runId})\n\n`;
+              comment += `*Analyzed with Slither v0.11.3 • Run #${context.runNumber}*`;
+              
+              // 创建PR评论
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+              
+              console.log('✅ PR comment posted successfully');
+            } catch (error) {
+              console.error('Error creating PR comment:', error);
+              // 不让评论失败影响整个工作流成功状态
+            }

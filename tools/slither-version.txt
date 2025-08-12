@@ -1,0 +1,6 @@
+slither: /Users/youshuncheng/Library/Python/3.9/lib/python/site-packages/slither/__main__.py:172: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import iter_entry_points  # pylint: disable=import-outside-toplevel
+0.11.3
+python : Python 3.9.6
+solc   : solc, the solidity compiler commandline interface
+forge  : forge Version: 1.2.3-stable
