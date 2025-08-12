@@ -1,0 +1,13 @@
+{
+  "blockNumber": 18500000,
+  "rpcUrl": "https://mainnet.infura.io/v3/217898f2f451480bb40ae0829711e8ce",
+  "network": "mainnet",
+  "timestamp": "2023-11-15",
+  "description": "Fixed fork block for Compound v3 liquidation testing",
+  "contracts": {
+    "comet": "0xc3d688B66703497DAA19211EEdff47f25384cdc3",
+    "baseToken": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "collateralToken": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+  },
+  "usage": "This fixed block ensures reproducible liquidation testing results"
+}

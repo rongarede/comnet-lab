@@ -60,17 +60,46 @@ FOUNDRY_INVARIANT_DEPTH=100 FOUNDRY_INVARIANT_RUNS=200 forge test -vv
 ## 🧪 主网分叉（mainnet-fork）
 
 - **市场**：USDC（Compound v3 / Comet）
+- **固定区块号**：**18500000**（通过 `fork.json` 锁定，确保可重现结果）
 - **第一版脚本**：
   - `scripts/fork_read.s.sol`（只读三会计量，验证 RPC 与地址）
-  - `scripts/fork_liquidation_min.s.sol`（最小清算：只对自建小仓位 absorb + buyCollateral 一次）
-- **规则**：先用 latest 调通，立刻锁定区块号，并把命令、日志、区块号写进 reports/
+  - `scripts/fork_liquidation_min.s.sol`（零回退清算测试：自建仓位→价格模拟→absorb+buyCollateral→三大断言）
 
-运行示例：
+### 固定区块号 Fork
+
+为确保实验可重现，所有 fork 脚本均锁定在**区块 18500000**：
+
+```json
+// fork.json
+{
+  "blockNumber": 18500000,
+  "network": "mainnet",
+  "description": "Fixed fork block for Compound v3 liquidation testing"
+}
+```
+
+脚本会优先从 `fork.json` 读取区块号，确保每次运行环境一致。
+
+### 运行示例
 
 ```bash
-export MAINNET_RPC_URL=...
-forge script scripts/fork_read.s.sol:ForkRead --fork-url $MAINNET_RPC_URL -vvvv
+# 设置环境变量
+export RPC_URL=https://mainnet.infura.io/v3/YOUR_KEY
+export MOCK_MODE=1
+
+# 只读测试（验证连接性）
+forge script scripts/fork_read.s.sol --fork-url $RPC_URL --ffi -v
+
+# 完整清算测试（包含三大断言）
+forge script scripts/fork_liquidation_min.s.sol --fork-url $RPC_URL --ffi -v
 ```
+
+### 清算测试断言
+
+脚本包含三个核心断言（零回退设计）：
+- **债务减少公式**：`expected = min(debtBefore, seizedCollateral × price × (1-discount))`
+- **清算者盈亏**：PnL ≥ 0
+- **事件验证**：AbsorbDebt + AbsorbCollateral 事件一致性
 
 ## ⛽ Gas 基线与回归守门
 
