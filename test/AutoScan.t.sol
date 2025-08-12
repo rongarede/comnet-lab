@@ -25,7 +25,7 @@ contract AutoScanTest is Test {
         // Expect the event to be emitted
         vm.expectEmit(true, false, false, true);
         emit PriceRequested(asset, 1e8, 8);
-        
+
         // Call the function which will emit the event
         (uint256 price, uint8 scale) = libRead.priceOf(asset);
 
@@ -37,7 +37,7 @@ contract AutoScanTest is Test {
         // Expect the event to be emitted
         vm.expectEmit(false, false, false, true);
         emit AccountingQueried(1000000e6, 800000e6, 50000e6);
-        
+
         // Call the function which will emit the event
         (uint256 cash, uint256 borrows, uint256 reserves, uint8 baseDecimals) = libRead.accounting();
 
